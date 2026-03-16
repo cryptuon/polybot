@@ -1,0 +1,146 @@
+# Crypto asset aliases and hedging instruments
+# Maps common names to standard symbols
+
+aliases:
+  # Bitcoin
+  bitcoin: BTC
+  btc: BTC
+  xbt: BTC
+
+  # Ethereum
+  ethereum: ETH
+  eth: ETH
+  ether: ETH
+
+  # Solana
+  solana: SOL
+  sol: SOL
+
+  # Ripple/XRP
+  ripple: XRP
+  xrp: XRP
+
+  # Cardano
+  cardano: ADA
+  ada: ADA
+
+  # Dogecoin
+  dogecoin: DOGE
+  doge: DOGE
+
+  # Polkadot
+  polkadot: DOT
+  dot: DOT
+
+  # Avalanche
+  avalanche: AVAX
+  avax: AVAX
+
+  # Polygon
+  polygon: MATIC
+  matic: MATIC
+
+  # Chainlink
+  chainlink: LINK
+  link: LINK
+
+  # Litecoin
+  litecoin: LTC
+  ltc: LTC
+
+  # Uniswap
+  uniswap: UNI
+  uni: UNI
+
+  # Aave
+  aave: AAVE
+
+  # Arbitrum
+  arbitrum: ARB
+  arb: ARB
+
+  # Optimism
+  optimism: OP
+  op: OP
+
+# Default hedge instruments by asset
+hedge_instruments:
+  BTC:
+    - venue: binance
+      symbol: BTCUSDT
+      type: spot
+      weight: 1.0
+    - venue: binance
+      symbol: BTCUSDT
+      type: perpetual
+      weight: 1.0
+
+  ETH:
+    - venue: binance
+      symbol: ETHUSDT
+      type: spot
+      weight: 1.0
+    - venue: binance
+      symbol: ETHUSDT
+      type: perpetual
+      weight: 1.0
+
+  SOL:
+    - venue: binance
+      symbol: SOLUSDT
+      type: spot
+      weight: 1.0
+
+  XRP:
+    - venue: binance
+      symbol: XRPUSDT
+      type: spot
+      weight: 1.0
+
+  ADA:
+    - venue: binance
+      symbol: ADAUSDT
+      type: spot
+      weight: 1.0
+
+  DOGE:
+    - venue: binance
+      symbol: DOGEUSDT
+      type: spot
+      weight: 1.0
+
+  DOT:
+    - venue: binance
+      symbol: DOTUSDT
+      type: spot
+      weight: 1.0
+
+  AVAX:
+    - venue: binance
+      symbol: AVAXUSDT
+      type: spot
+      weight: 1.0
+
+  MATIC:
+    - venue: binance
+      symbol: MATICUSDT
+      type: spot
+      weight: 1.0
+
+  LINK:
+    - venue: binance
+      symbol: LINKUSDT
+      type: spot
+      weight: 1.0
+
+  LTC:
+    - venue: binance
+      symbol: LTCUSDT
+      type: spot
+      weight: 1.0
+
+  UNI:
+    - venue: binance
+      symbol: UNIUSDT
+      type: spot
+      weight: 1.0

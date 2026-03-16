@@ -1,0 +1,91 @@
+# =============================================================================
+# PolyBot Docker Compose Configuration
+# Production deployment for self-hosted VPS
+# =============================================================================
+
+version: '3.8'
+
+services:
+  # ===========================================================================
+  # Main Application
+  # ===========================================================================
+  polybot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: polybot-app
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - polybot-data:/app/data
+      - polybot-logs:/app/logs
+    env_file:
+      - .env
+    environment:
+      - API_HOST=0.0.0.0
+      - LOG_FORMAT=json
+    networks:
+      - polybot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # ===========================================================================
+  # Prometheus Monitoring (Optional)
+  # ===========================================================================
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    container_name: polybot-prometheus
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9090:9090"
+    volumes:
+      - ./deploy/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.enable-lifecycle'
+    networks:
+      - polybot-network
+    profiles:
+      - monitoring
+
+  # ===========================================================================
+  # Grafana Dashboard (Optional)
+  # ===========================================================================
+  grafana:
+    image: grafana/grafana:10.2.2
+    container_name: polybot-grafana
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-polybot123}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    networks:
+      - polybot-network
+    profiles:
+      - monitoring
+
+networks:
+  polybot-network:
+    driver: bridge
+
+volumes:
+  polybot-data:
+    name: polybot-data
+  polybot-logs:
+    name: polybot-logs
+  prometheus-data:
+    name: polybot-prometheus-data
+  grafana-data:
+    name: polybot-grafana-data

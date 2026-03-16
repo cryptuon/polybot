@@ -1,0 +1,101 @@
+# Event pattern definitions for classification
+# Each pattern extracts entities from prediction market questions
+
+patterns:
+  # Crypto price threshold patterns
+  - pattern_id: "crypto_price_above"
+    regex: "(?i)(?:will\\s+)?([A-Za-z]+)\\s+(?:be\\s+)?(?:above|over|reach|hit|exceed)\\s+\\$?([\\d,]+(?:\\.\\d+)?)"
+    category: "crypto_price"
+    confidence: "exact"
+    asset_group: 1
+    threshold_group: 2
+    threshold_direction: "above"
+    description: "Matches 'Will BTC be above $100,000'"
+
+  - pattern_id: "crypto_price_below"
+    regex: "(?i)(?:will\\s+)?([A-Za-z]+)\\s+(?:be\\s+)?(?:below|under|fall\\s+below|drop\\s+below)\\s+\\$?([\\d,]+(?:\\.\\d+)?)"
+    category: "crypto_price"
+    confidence: "exact"
+    asset_group: 1
+    threshold_group: 2
+    threshold_direction: "below"
+    description: "Matches 'Will BTC fall below $50,000'"
+
+  - pattern_id: "crypto_price_between"
+    regex: "(?i)(?:will\\s+)?([A-Za-z]+)\\s+(?:be\\s+)?(?:between)\\s+\\$?([\\d,]+(?:\\.\\d+)?)\\s+and\\s+\\$?([\\d,]+(?:\\.\\d+)?)"
+    category: "crypto_price"
+    confidence: "proxy"
+    asset_group: 1
+    threshold_group: 2
+    threshold_high_group: 3
+    threshold_direction: "between"
+    description: "Matches 'Will BTC be between $80k and $100k'"
+
+  # All-time high patterns
+  - pattern_id: "crypto_ath"
+    regex: "(?i)(?:will\\s+)?([A-Za-z]+)\\s+(?:reach|hit|make)?\\s*(?:new\\s+)?(?:all[- ]time\\s+high|ATH)"
+    category: "crypto_price"
+    confidence: "proxy"
+    asset_group: 1
+    description: "Matches 'Will BTC hit a new ATH'"
+
+  # Volatility patterns
+  - pattern_id: "crypto_volatility_move"
+    regex: "(?i)(?:will\\s+)?([A-Za-z]+)\\s+(?:move|change|swing)\\s+(\\d+(?:\\.\\d+)?)\\s*%"
+    category: "crypto_volatility"
+    confidence: "exact"
+    asset_group: 1
+    threshold_group: 2
+    description: "Matches 'Will BTC move 10%'"
+
+  - pattern_id: "crypto_volatility_drop"
+    regex: "(?i)(?:will\\s+)?([A-Za-z]+)\\s+(?:drop|crash|fall)\\s+(\\d+(?:\\.\\d+)?)\\s*%"
+    category: "crypto_volatility"
+    confidence: "exact"
+    asset_group: 1
+    threshold_group: 2
+    threshold_direction: "below"
+    description: "Matches 'Will BTC drop 20%'"
+
+  - pattern_id: "crypto_volatility_pump"
+    regex: "(?i)(?:will\\s+)?([A-Za-z]+)\\s+(?:pump|surge|rally|rise)\\s+(\\d+(?:\\.\\d+)?)\\s*%"
+    category: "crypto_volatility"
+    confidence: "exact"
+    asset_group: 1
+    threshold_group: 2
+    threshold_direction: "above"
+    description: "Matches 'Will BTC pump 50%'"
+
+  # Date patterns
+  - pattern_id: "date_by_month_year"
+    regex: "(?i)by\\s+((?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\\s+\\d{1,2}(?:,?\\s*\\d{4})?)"
+    category: "time_based"
+    confidence: "exact"
+    date_group: 1
+    description: "Extracts date from 'by December 31, 2024'"
+
+  - pattern_id: "date_end_of"
+    regex: "(?i)(?:by\\s+)?(?:the\\s+)?end\\s+of\\s+((?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*(?:\\s+\\d{4})?|\\d{4}|Q[1-4])"
+    category: "time_based"
+    confidence: "exact"
+    date_group: 1
+    description: "Extracts date from 'by end of 2024'"
+
+  # Market cap patterns
+  - pattern_id: "market_cap"
+    regex: "(?i)(?:will\\s+)?([A-Za-z]+)\\s+(?:market\\s+cap|mcap)\\s+(?:reach|hit|exceed|be\\s+above)\\s+\\$?([\\d,]+(?:\\.\\d+)?)\\s*(billion|trillion|B|T)?"
+    category: "crypto_price"
+    confidence: "proxy"
+    asset_group: 1
+    threshold_group: 2
+    multiplier_group: 3
+    description: "Matches 'Will BTC market cap reach $2 trillion'"
+
+  # Dominance patterns
+  - pattern_id: "btc_dominance"
+    regex: "(?i)(?:will\\s+)?(?:bitcoin|BTC)\\s+dominance\\s+(?:be\\s+)?(?:above|over|below|under)\\s+(\\d+(?:\\.\\d+)?)\\s*%"
+    category: "crypto_price"
+    confidence: "proxy"
+    asset_group: 1
+    threshold_group: 1
+    description: "Matches 'Will BTC dominance be above 50%'"

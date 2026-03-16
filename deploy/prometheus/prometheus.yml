@@ -1,0 +1,18 @@
+# Prometheus configuration for PolyBot monitoring
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # PolyBot API metrics
+  - job_name: 'polybot'
+    static_configs:
+      - targets: ['polybot:8000']
+    metrics_path: '/metrics'
+    scrape_interval: 10s

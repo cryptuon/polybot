@@ -1,0 +1,51 @@
+# Git
+.git
+.gitignore
+
+# Python
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info
+dist
+build
+.eggs
+
+# Development
+.env
+.env.local
+*.log
+.coverage
+htmlcov
+.pytest_cache
+.mypy_cache
+.ruff_cache
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Data (will be mounted as volumes)
+data/
+*.db
+*.duckdb
+
+# Frontend build files (built in Docker)
+frontend/node_modules
+frontend/dist
+
+# Documentation
+documentation/site
+
+# Test artifacts
+tests/__pycache__
+.tox
+
+# OS
+.DS_Store
+Thumbs.db
