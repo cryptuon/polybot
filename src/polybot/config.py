@@ -281,6 +281,51 @@ class AuthConfig(BaseSettings):
     )
 
 
+class MCPConfig(BaseSettings):
+    """MCP (Model Context Protocol) server configuration for AI agent integration."""
+
+    model_config = SettingsConfigDict(env_prefix="MCP_", env_file=".env", extra="ignore")
+
+    # Server settings
+    enabled: bool = Field(default=False, description="Enable MCP server")
+    host: str = Field(default="127.0.0.1", description="MCP server host")
+    port: int = Field(default=3001, description="MCP server port")
+
+    # Trading mode: disabled (read-only), shadow (paper trading), live (real trading)
+    ai_trading_mode: Literal["disabled", "shadow", "live"] = Field(
+        default="shadow",
+        description="AI agent trading mode: disabled, shadow, or live",
+    )
+
+    # AI-specific risk limits (subset of main risk limits)
+    max_position_usd: float = Field(default=100.0, description="Max position per AI trade")
+    max_daily_trades: int = Field(default=50, description="Max AI trades per day")
+    daily_loss_limit_usd: float = Field(default=200.0, description="AI daily loss limit")
+
+    # Approval settings for live trading
+    require_approval: bool = Field(
+        default=True, description="Require human approval for live trades"
+    )
+    approval_timeout_sec: int = Field(
+        default=300, description="Auto-reject pending trades after timeout"
+    )
+
+    # Rate limiting and audit
+    rate_limit_per_min: int = Field(default=30, description="Max tool calls per minute")
+    audit_log_enabled: bool = Field(default=True, description="Log all AI actions")
+
+    # Strategy assessment settings
+    allow_code_read: bool = Field(
+        default=True, description="Allow AI to read strategy source code"
+    )
+    allow_cli_execution: bool = Field(
+        default=True, description="Allow AI to run whitelisted CLI commands"
+    )
+    assessment_lookback_days: int = Field(
+        default=30, description="Days of history for strategy analysis"
+    )
+
+
 class CORSConfig(BaseSettings):
     """CORS configuration."""
 
@@ -323,6 +368,7 @@ class Settings(BaseSettings):
     log: LogConfig = Field(default_factory=LogConfig)
     auth: AuthConfig = Field(default_factory=AuthConfig)
     cors: CORSConfig = Field(default_factory=CORSConfig)
+    mcp: MCPConfig = Field(default_factory=MCPConfig)
 
     # Multi-venue configurations
     venues: VenuesConfig = Field(default_factory=VenuesConfig)

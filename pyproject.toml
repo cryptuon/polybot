@@ -63,6 +63,7 @@ dependencies = [
     "rich>=13.0",
     "numpy>=1.26",
     "py-clob-client>=0.34.1",
+    "mcp>=1.0.0",
 ]
 
 [project.optional-dependencies]

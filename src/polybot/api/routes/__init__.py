@@ -8,6 +8,7 @@ from polybot.api.routes.analytics import router as analytics_router
 from polybot.api.routes.settings import router as settings_router
 from polybot.api.routes.strategy_logs import router as strategy_logs_router
 from polybot.api.routes.shadow import router as shadow_router
+from polybot.api.routes.mcp import router as mcp_router
 
 __all__ = [
     "markets_router",
@@ -18,4 +19,5 @@ __all__ = [
     "settings_router",
     "strategy_logs_router",
     "shadow_router",
+    "mcp_router",
 ]

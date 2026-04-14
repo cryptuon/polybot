@@ -167,6 +167,67 @@ class MyAIPlugin(AIModelPlugin):
 
 [Developer Guide](https://docs.cryptuon.com/polybot/developer-guide/)
 
+## AI Agent Integration
+
+PolyBot includes comprehensive AI agent integration via MCP (Model Context Protocol):
+
+- **MCP Server** for AI agents (Claude, etc.) to interact with trading
+- **Strategy Assessment** for AI to analyze and improve strategies
+- **Claude Code Skill** for direct CLI interaction
+
+### Quick Start
+
+```bash
+# Enable MCP server
+export MCP_ENABLED=true
+export MCP_AI_TRADING_MODE=shadow  # Start with paper trading
+
+# Start MCP server
+polybot mcp start
+```
+
+### Claude Code Skill
+
+Install the skill for direct CLI access in Claude Code:
+
+```bash
+cp -r .claude/skills ~/.claude/skills/
+```
+
+Then use `/polybot` in Claude Code:
+```
+/polybot strategy list
+/polybot mcp status
+```
+
+### AI Capabilities
+
+| Feature | Description |
+|---------|-------------|
+| **Market Analysis** | Query markets, prices, positions |
+| **Shadow Trading** | Paper trade without real money |
+| **Live Trading** | Real orders with approval workflow |
+| **Strategy Assessment** | Analyze performance, suggest improvements |
+| **CLI Execution** | Run polybot commands programmatically |
+
+### Trading Modes
+
+| Mode | Description |
+|------|-------------|
+| `disabled` | AI can only read market data |
+| `shadow` | AI can paper trade (no real money) |
+| `live` | AI can submit real orders (with approval) |
+
+### Safety Controls
+
+- **Position Limits**: AI trades limited to `MCP_MAX_POSITION_USD`
+- **Daily Loss Limit**: Auto-disable if `MCP_DAILY_LOSS_LIMIT_USD` exceeded
+- **Approval Queue**: Live trades require human approval by default
+- **Audit Logging**: All AI actions logged for review
+- **CLI Whitelist**: Only safe commands allowed via MCP
+
+[AI Integration Guide](https://docs.cryptuon.com/polybot/user-guide/ai-agents/)
+
 ## Architecture
 
 ```
@@ -214,6 +275,15 @@ polybot strategy run <name>        # Run single strategy
 polybot ai plugins                 # List AI plugins
 polybot ai predict <market_id>     # Test prediction
 polybot ai scan                    # Scan for opportunities
+
+# MCP (AI Agent) management
+polybot mcp start                  # Start MCP server
+polybot mcp status                 # Show status and pending approvals
+polybot mcp mode <mode>            # Set AI trading mode
+polybot mcp pending                # List pending approvals
+polybot mcp approve <id>           # Approve AI trade
+polybot mcp reject <id>            # Reject AI trade
+polybot mcp audit                  # View AI action audit log
 
 # Database
 polybot db init            # Initialize databases

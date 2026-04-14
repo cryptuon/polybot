@@ -20,6 +20,7 @@ from polybot.api.routes import (
     settings_router,
     strategy_logs_router,
     shadow_router,
+    mcp_router,
 )
 from polybot.api.websocket import websocket_endpoint, manager
 from polybot.api.health import router as health_router
@@ -113,6 +114,7 @@ def create_app() -> FastAPI:
     app.include_router(settings_router, prefix="/api")
     app.include_router(strategy_logs_router, prefix="/api")
     app.include_router(shadow_router, prefix="/api")
+    app.include_router(mcp_router, prefix="/api")
 
     # WebSocket endpoint
     app.websocket("/ws")(websocket_endpoint)

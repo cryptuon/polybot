@@ -107,6 +107,8 @@ nav:
     - Shadow Mode: user-guide/shadow-mode.md
     - Dashboard: user-guide/dashboard.md
     - CLI Reference: user-guide/cli-reference.md
+    - AI Agents: user-guide/ai-agents.md
+    - Claude Code Skill: user-guide/claude-code-skill.md
   - Developer Guide:
     - developer-guide/index.md
     - Architecture: developer-guide/architecture.md
@@ -117,6 +119,7 @@ nav:
       - AI Plugins: developer-guide/extending/ai-plugins.md
     - API Reference:
       - developer-guide/api-reference/index.md
+    - MCP Server: developer-guide/mcp-server.md
     - Contributing: developer-guide/contributing.md
   - Deployment:
     - deployment/index.md

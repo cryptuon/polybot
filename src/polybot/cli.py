@@ -1032,6 +1032,202 @@ def scan_opportunities(plugin: str, min_edge: float, limit: int) -> None:
 
 
 # =============================================================================
+# MCP Commands
+# =============================================================================
+
+
+@cli.group()
+def mcp() -> None:
+    """MCP server and AI agent management."""
+    pass
+
+
+@mcp.command("start")
+@click.option("--host", default=None, help="Host to bind to")
+@click.option("--port", default=None, type=int, help="Port to bind to")
+def mcp_start(host: Optional[str], port: Optional[int]) -> None:
+    """Start the MCP server."""
+    from polybot.mcp.server import run_mcp_server
+
+    settings = get_settings()
+
+    if not settings.mcp.enabled:
+        console.print("[red]MCP server is disabled. Set MCP_ENABLED=true to enable.[/]")
+        sys.exit(1)
+
+    console.print(f"[bold green]Starting MCP server...[/]")
+    console.print(f"[dim]Mode: {settings.mcp.ai_trading_mode}[/]")
+    console.print(f"[dim]Approval required: {settings.mcp.require_approval}[/]")
+
+    asyncio.run(run_mcp_server())
+
+
+@mcp.command("status")
+def mcp_status() -> None:
+    """Show MCP server status, mode, and pending approvals."""
+    from polybot.mcp.approval import get_pending_approvals
+    from polybot.mcp.audit import get_audit_stats
+
+    settings = get_settings()
+
+    console.print("[bold]MCP Server Status[/]\n")
+
+    # Configuration
+    console.print("[cyan]Configuration:[/]")
+    console.print(f"  Enabled: {'[green]Yes[/]' if settings.mcp.enabled else '[red]No[/]'}")
+    console.print(f"  AI Trading Mode: [bold]{settings.mcp.ai_trading_mode}[/]")
+    console.print(f"  Require Approval: {'Yes' if settings.mcp.require_approval else 'No'}")
+    console.print(f"  Max Position USD: ${settings.mcp.max_position_usd}")
+    console.print(f"  Daily Loss Limit: ${settings.mcp.daily_loss_limit_usd}")
+
+    # Pending approvals
+    pending = get_pending_approvals()
+    console.print(f"\n[cyan]Pending Approvals:[/] {len(pending)}")
+    if pending:
+        for p in pending[:5]:
+            console.print(f"  [{p['id']}] {p['order_type']} - ${p['arguments'].get('size', 'N/A')}")
+
+    # Audit stats
+    stats = get_audit_stats(days=7)
+    console.print(f"\n[cyan]Activity (7 days):[/]")
+    console.print(f"  Total Actions: {stats['total_actions']}")
+    console.print(f"  Errors: {stats['errors']}")
+
+
+@mcp.command("mode")
+@click.argument("mode", type=click.Choice(["disabled", "shadow", "live"]))
+def mcp_set_mode(mode: str) -> None:
+    """Set AI trading mode (disabled, shadow, or live).
+
+    Note: This updates the runtime setting. For persistent change,
+    set MCP_AI_TRADING_MODE in your .env file.
+    """
+    console.print(f"[yellow]Setting AI trading mode to: {mode}[/]")
+    console.print("[dim]Note: This is a runtime change. Update MCP_AI_TRADING_MODE in .env for persistence.[/]")
+
+    # Update runtime setting
+    settings = get_settings()
+    settings.mcp.ai_trading_mode = mode  # type: ignore
+
+    if mode == "live":
+        console.print("[bold red]WARNING: Live trading mode enabled![/]")
+        if settings.mcp.require_approval:
+            console.print("[dim]Trades will require approval.[/]")
+        else:
+            console.print("[bold red]Approval is DISABLED - trades will execute immediately![/]")
+
+
+@mcp.command("approve")
+@click.argument("approval_id")
+def mcp_approve(approval_id: str) -> None:
+    """Approve a pending AI trade."""
+    from polybot.mcp.approval import approve_trade
+
+    async def do_approve() -> None:
+        try:
+            result = await approve_trade(approval_id, approved_by="cli_operator")
+            console.print(f"[green]Approved: {approval_id}[/]")
+            if result.get("execution_result"):
+                console.print(f"[dim]Execution result: {result['execution_result']}[/]")
+        except ValueError as e:
+            console.print(f"[red]Error: {e}[/]")
+
+    asyncio.run(do_approve())
+
+
+@mcp.command("reject")
+@click.argument("approval_id")
+@click.option("--reason", "-r", default="Rejected by operator", help="Rejection reason")
+def mcp_reject(approval_id: str, reason: str) -> None:
+    """Reject a pending AI trade."""
+    from polybot.mcp.approval import reject_trade
+
+    async def do_reject() -> None:
+        try:
+            await reject_trade(approval_id, reason=reason, rejected_by="cli_operator")
+            console.print(f"[yellow]Rejected: {approval_id}[/]")
+            console.print(f"[dim]Reason: {reason}[/]")
+        except ValueError as e:
+            console.print(f"[red]Error: {e}[/]")
+
+    asyncio.run(do_reject())
+
+
+@mcp.command("pending")
+def mcp_pending() -> None:
+    """List pending AI trade approvals."""
+    from polybot.mcp.approval import get_pending_approvals
+
+    pending = get_pending_approvals()
+
+    if not pending:
+        console.print("[dim]No pending approvals[/]")
+        return
+
+    table = Table(title="Pending Approvals")
+    table.add_column("ID", style="cyan")
+    table.add_column("Type")
+    table.add_column("Size", style="green")
+    table.add_column("Market")
+    table.add_column("Expires")
+    table.add_column("Reason")
+
+    for p in pending:
+        args = p["arguments"]
+        expires_in = (p["expires_at"] - asyncio.get_event_loop().time()).total_seconds() if hasattr(p["expires_at"], "total_seconds") else "?"
+
+        table.add_row(
+            p["id"],
+            p["order_type"],
+            f"${args.get('size', 'N/A')}",
+            args.get("market_id", "N/A")[:20] + "...",
+            f"{expires_in}s" if isinstance(expires_in, (int, float)) else str(p["expires_at"])[:16],
+            args.get("reason", "")[:30],
+        )
+
+    console.print(table)
+
+
+@mcp.command("audit")
+@click.option("--tail", "-n", default=20, help="Number of recent entries to show")
+@click.option("--agent", "-a", default=None, help="Filter by agent ID")
+def mcp_audit(tail: int, agent: Optional[str]) -> None:
+    """View AI agent audit log."""
+    from polybot.mcp.audit import get_audit_logs
+
+    logs = get_audit_logs(tail=tail, agent_id=agent)
+
+    if not logs:
+        console.print("[dim]No audit log entries found[/]")
+        return
+
+    table = Table(title=f"AI Agent Audit Log (last {tail})")
+    table.add_column("Time", style="dim")
+    table.add_column("Action", style="cyan")
+    table.add_column("Tool")
+    table.add_column("Details")
+
+    for entry in logs:
+        ts = entry.get("timestamp", "?")[:19]
+        action = entry.get("action", "?")
+        tool = entry.get("tool", "?")
+        args = entry.get("arguments", {})
+
+        # Create a brief summary of arguments
+        details = []
+        if args.get("market_id"):
+            details.append(f"market:{args['market_id'][:12]}...")
+        if args.get("size"):
+            details.append(f"${args['size']}")
+        if args.get("strategy"):
+            details.append(f"strat:{args['strategy']}")
+
+        table.add_row(ts, action, tool, " ".join(details)[:40])
+
+    console.print(table)
+
+
+# =============================================================================
 # Main Entry Point
 # =============================================================================
 
