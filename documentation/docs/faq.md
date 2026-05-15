@@ -226,7 +226,7 @@ They run concurrently and share risk limits.
 
 ### How do I contribute?
 
-See [Contributing Guide](CONTRIBUTING.md). We welcome:
+See the [Contributing Guide](developer-guide/contributing.md). We welcome:
 - Bug fixes
 - New strategies
 - Documentation improvements

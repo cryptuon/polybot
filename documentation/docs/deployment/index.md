@@ -14,16 +14,6 @@ docker compose up -d
 
 [Docker deployment guide](docker.md)
 
-### Kubernetes
-
-For scalable deployments:
-
-- Helm chart available
-- Horizontal scaling
-- Secret management
-
-[Kubernetes guide](kubernetes.md)
-
 ### Manual
 
 For custom setups:
