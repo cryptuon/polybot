@@ -6,11 +6,10 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [
-    { name = "Dipankar Sarkar", email = "me@dipankar.name" },
-    { name = "Cryptuon Team" }
+    { name = "Cryptuon Research", email = "contact@cryptuon.com" }
 ]
 maintainers = [
-    { name = "Dipankar Sarkar", email = "me@dipankar.name" }
+    { name = "Cryptuon Research", email = "contact@cryptuon.com" }
 ]
 keywords = [
     "trading-bot",
@@ -81,8 +80,8 @@ docs = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/cryptuon/polybot"
-Documentation = "https://docs.cryptuon.com/polybot"
+Homepage = "https://polybot.cryptuon.com/"
+Documentation = "https://docs.cryptuon.com/polybot/"
 Repository = "https://github.com/cryptuon/polybot"
 Issues = "https://github.com/cryptuon/polybot/issues"
 Changelog = "https://github.com/cryptuon/polybot/blob/main/CHANGELOG.md"

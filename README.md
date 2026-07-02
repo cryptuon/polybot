@@ -16,6 +16,8 @@
 [Strategies](#strategies) |
 [Discord](https://discord.gg/cryptuon)
 
+**[🌐 Site](https://polybot.cryptuon.com/) · [📚 Docs](https://docs.cryptuon.com/polybot/) · [📦 PyPI package](https://pypi.org/project/polybot-trader/) · [🔬 Cryptuon Research](https://github.com/cryptuon)**
+
 </div>
 
 ---
@@ -362,5 +364,15 @@ This software is for educational and research purposes. Trading on prediction ma
 ---
 
 <div align="center">
-  <sub>Built with care by <a href="https://cryptuon.com">Cryptuon</a></sub>
+  <sub>Built with care by <a href="https://www.cryptuon.com">Cryptuon</a></sub>
 </div>
+
+---
+
+## Part of Cryptuon Research
+
+`polybot` is one of [20 open-source blockchain-infrastructure projects](https://www.cryptuon.com/projects) from **[Cryptuon Research](https://www.cryptuon.com)** — blockchain theory, shipped as protocols.
+
+**Related projects:** [dgbit](https://dgbit.cryptuon.com/) · [Mentat](https://mentat.cryptuon.com/) · [Moby Market](https://mobymarket.cryptuon.com/)
+
+Docs: [docs.cryptuon.com/polybot](https://docs.cryptuon.com/polybot/) · Contact: [contact@cryptuon.com](mailto:contact@cryptuon.com)

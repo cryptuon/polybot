@@ -1,12 +1,12 @@
 site_name: PolyBot
 site_url: https://docs.cryptuon.com/polybot/
 site_description: "Open-source automated trading system for prediction markets"
-site_author: "Dipankar Sarkar"
+site_author: "Cryptuon Research"
 repo_url: https://github.com/cryptuon/polybot
 repo_name: cryptuon/polybot
 edit_uri: edit/main/documentation/docs/
 
-copyright: "Copyright &copy; 2026 Cryptuon"
+copyright: "&copy; 2026 Cryptuon Research"
 
 theme:
   name: material
@@ -76,11 +76,14 @@ markdown_extensions:
       permalink: true
 
 extra:
+  homepage: https://polybot.cryptuon.com/
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/cryptuon/polybot
     - icon: fontawesome/brands/discord
       link: https://discord.gg/cryptuon
+    - icon: material/web
+      link: https://www.cryptuon.com
 
 nav:
   - Home: index.md
