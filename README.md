@@ -2,7 +2,7 @@
 
 # PolyBot
 
-**Open-source automated trading system for prediction markets**
+**Open-source, agent-driven trading framework for prediction markets**
 
 [![PyPI](https://img.shields.io/pypi/v/polybot-trader?color=blue)](https://pypi.org/project/polybot-trader/)
 [![Python](https://img.shields.io/pypi/pyversions/polybot-trader)](https://pypi.org/project/polybot-trader/)
@@ -14,6 +14,7 @@
 [Documentation](https://docs.cryptuon.com/polybot) |
 [Quick Start](#quick-start) |
 [Strategies](#strategies) |
+[Roadmap](ROADMAP.md) |
 [Discord](https://discord.gg/cryptuon)
 
 **[🌐 Site](https://polybot.cryptuon.com/) · [📚 Docs](https://docs.cryptuon.com/polybot/) · [📦 PyPI package](https://pypi.org/project/polybot-trader/) · [🔬 Cryptuon Research](https://github.com/cryptuon)**
@@ -22,35 +23,51 @@
 
 ---
 
-Trade smarter on **Polymarket**, **Kalshi**, and other prediction markets with 10 battle-tested strategies, real-time analytics, and a plugin system for your own AI models.
+PolyBot is an **agent-driven trading framework for prediction markets**. It gives LLM agents — and the humans supervising them — a typed, safe-by-default surface for analysing and trading event contracts across **Polymarket**, **Kalshi**, **Opinion**, and **Binance** (for hedging). Agents drive the system through a native **MCP server** that exposes **25+ typed tools**; every strategy runs in **paper (shadow) mode by default**, and any live order is **human-in-the-loop approval-gated** and audit-logged.
 
-> **New: AI Agent Integration** - PolyBot now includes an MCP server for AI agents, a Claude Code skill (`/polybot`), and strategy assessment tools. Let AI analyze your strategies and execute trades with full safety controls.
+It is a Python CLI and framework — MIT-licensed, self-hosted, your keys and your data. Not a hosted service, not a signals newsletter, and not financial advice.
+
+> **AI Agent Integration** — PolyBot ships an MCP server for AI agents, a Claude Code skill (`/polybot`), and strategy-assessment tools. An agent can analyse markets and *propose* trades; a human approves them. Read-only and paper modes need no approval; live trading does.
+
+## Why this matters in 2026
+
+Two curves are crossing. Prediction markets went from a niche to one of the most-watched market structures anywhere — election, macro, and event contracts now clear real volume across Polymarket, Kalshi, and a growing set of on-chain venues. At the same time, LLM agents crossed the threshold where they can genuinely reason over market microstructure, read news, and hold a thesis.
+
+The obvious next step — *let an agent trade these markets* — is also the dangerous one. An agent with an API key and no guardrails is a liability, not a product. PolyBot exists for the safe version of that idea: agents as **first-class principals with typed tools, hard risk limits, and mandatory human approval on anything that moves real money.** The default is paper trading. Going live is an explicit, per-strategy decision, and even then an agent proposes while a human disposes.
+
+If you believe agents will operate markets in 2026, the interesting engineering problem is not "can the model trade" — it's "can it trade *safely, auditably, and within limits you set*." That is the problem PolyBot is built around. See [ROADMAP.md](ROADMAP.md) for where it goes next.
+
+**No returns are promised or implied.** Prediction-market trading carries financial risk; PolyBot is infrastructure for doing it carefully, not a strategy for making money.
 
 ## Why PolyBot?
 
-| Feature | PolyBot | Others |
-|---------|---------|--------|
-| **Strategies** | 10 built-in | 1-3 typically |
-| **Multi-Venue** | Polymarket, Kalshi, Binance | Single venue |
-| **AI Integration** | Plugin system for any model | Hardcoded or none |
-| **MCP Server** | Full AI agent integration | None |
-| **Claude Code Skill** | `/polybot` commands | None |
-| **Dashboard** | Vue.js real-time UI | Terminal or none |
-| **License** | MIT | Often GPL or closed |
+Most people building an agent for prediction markets end up hand-writing a bespoke bot per venue — a Polymarket script, a Kalshi script, a fragile LLM prompt, and risk checks copy-pasted into each. PolyBot replaces that with one typed framework.
 
-### Built for Traders
+| Approach | Bespoke bots per venue | PolyBot |
+|----------|------------------------|---------|
+| **Venues** | One integration per script | Polymarket, Kalshi, Opinion, Binance behind one `BaseVenue` |
+| **Domain model** | Re-derive markets/orders/positions each time | Shared Pydantic types across every venue and strategy |
+| **Risk** | Bolted onto each script, drifts out of sync | Position/exposure/loss caps enforced in the platform, pre-submission |
+| **Agent access** | Custom prompt glue, no guardrails | Native MCP server, 25+ typed tools, approval-gated |
+| **Safety default** | Usually live from day one | Paper (shadow) mode by default |
+| **Audit** | Ad hoc logging, if any | Every signal, order, and tool call logged |
+| **License** | Varies | MIT |
 
-- **Shadow Mode**: Test strategies without risking capital
-- **Risk Controls**: Position limits, daily loss limits, exposure caps
-- **Real-time P&L**: Track performance across all positions
-- **Whale Tracking**: Follow successful traders automatically
+*Honest tradeoff:* a bespoke bot for a single venue can be simpler and lower-dependency if you only ever trade that one venue and never involve an agent. PolyBot earns its weight when you want multiple venues, agent access, or shared risk — not before.
 
-### Built for Developers
+### Built for agent-driven trading
 
-- **Clean Abstractions**: Extend with custom strategies, venues, or AI models
-- **Type-Safe**: Full type hints, Pydantic models, mypy strict
-- **Well Documented**: Comprehensive guides and API reference
-- **Production Ready**: Docker, Prometheus metrics, structured logging
+- **Agent-native**: an MCP server exposes 25+ typed tools so Claude, GPT, or any MCP client can analyse markets and place approval-gated trades.
+- **Human-in-the-loop**: live trades require explicit human approval — agents never fill blindly.
+- **Shadow Mode**: every strategy paper-trades by default; promote to live per-strategy, reversibly.
+- **Risk Controls**: position limits, daily loss limits, exposure caps — enforced platform-wide, before submission.
+
+### Built for developers
+
+- **Clean Abstractions**: extend with custom strategies, venues, or AI models.
+- **Type-Safe**: full type hints, Pydantic models, `mypy --strict`.
+- **Well Documented**: comprehensive guides and API reference.
+- **Self-hosted**: Docker, Prometheus metrics, structured logging — your infra, your keys.
 
 ## Quick Start
 
@@ -71,6 +88,8 @@ cp .env.example .env
 ```
 
 ### Start Trading (Shadow Mode)
+
+Shadow (paper) mode is the default. No real orders are placed until you explicitly promote a strategy to live.
 
 ```bash
 # Initialize databases
@@ -108,6 +127,8 @@ PolyBot includes 10 trading strategies for prediction markets:
 | **Momentum** | Trend-following on price movements | High |
 | **Poll Divergence** | Trade when polls diverge from prices | Medium |
 | **Volume Spike** | React to unusual volume patterns | High |
+
+Risk levels describe strategy mechanics, not expected returns — every strategy can lose money.
 
 [Full strategy documentation](https://docs.cryptuon.com/polybot/user-guide/strategies/)
 
@@ -175,7 +196,7 @@ class MyAIPlugin(AIModelPlugin):
 
 ## AI Agent Integration
 
-PolyBot includes comprehensive AI agent integration via MCP (Model Context Protocol):
+PolyBot treats AI agents as first-class principals via MCP (Model Context Protocol):
 
 - **MCP Server** for AI agents (Claude, etc.) to interact with trading
 - **Strategy Assessment** for AI to analyze and improve strategies
@@ -186,7 +207,7 @@ PolyBot includes comprehensive AI agent integration via MCP (Model Context Proto
 ```bash
 # Enable MCP server
 export MCP_ENABLED=true
-export MCP_AI_TRADING_MODE=shadow  # Start with paper trading
+export MCP_AI_TRADING_MODE=shadow  # Start with paper trading (this is the default)
 
 # Start MCP server
 polybot mcp start
@@ -212,25 +233,29 @@ Then use `/polybot` in Claude Code:
 |---------|-------------|
 | **Market Analysis** | Query markets, prices, positions |
 | **Shadow Trading** | Paper trade without real money |
-| **Live Trading** | Real orders with approval workflow |
+| **Live Trading** | Real orders with human approval workflow |
 | **Strategy Assessment** | Analyze performance, suggest improvements |
-| **CLI Execution** | Run polybot commands programmatically |
+| **CLI Execution** | Run whitelisted polybot commands programmatically |
 
 ### Trading Modes
+
+The default mode is `shadow`. An agent cannot move real money until you explicitly switch to `live`, and even then each trade is approval-gated.
 
 | Mode | Description |
 |------|-------------|
 | `disabled` | AI can only read market data |
-| `shadow` | AI can paper trade (no real money) |
-| `live` | AI can submit real orders (with approval) |
+| `shadow` | AI can paper trade (no real money) — **default** |
+| `live` | AI can submit real orders (human approval required) |
 
 ### Safety Controls
 
-- **Position Limits**: AI trades limited to `MCP_MAX_POSITION_USD`
-- **Daily Loss Limit**: Auto-disable if `MCP_DAILY_LOSS_LIMIT_USD` exceeded
-- **Approval Queue**: Live trades require human approval by default
-- **Audit Logging**: All AI actions logged for review
-- **CLI Whitelist**: Only safe commands allowed via MCP
+- **Paper-trading default**: agents start in `shadow`; live trading is opt-in, per-strategy.
+- **Human-in-the-loop**: live trades require human approval by default (`MCP_REQUIRE_APPROVAL`).
+- **Position Limits**: AI trades limited to `MCP_MAX_POSITION_USD`.
+- **Daily Loss Limit**: auto-disable if `MCP_DAILY_LOSS_LIMIT_USD` exceeded.
+- **Approval Queue**: pending live trades wait for a human at the CLI.
+- **Audit Logging**: all AI actions logged for review.
+- **CLI Whitelist**: only safe commands allowed via MCP.
 
 [AI Integration Guide](https://docs.cryptuon.com/polybot/user-guide/ai-agents/)
 
@@ -309,33 +334,36 @@ polybot auth               # Manage API credentials
 - [AI Plugin Development](https://docs.cryptuon.com/polybot/developer-guide/extending/ai-plugins/)
 - [Docker Deployment](https://docs.cryptuon.com/polybot/deployment/docker/)
 - [API Reference](https://docs.cryptuon.com/polybot/developer-guide/api-reference/)
+- [Roadmap](ROADMAP.md)
 
 ## Comparison with Alternatives
 
-| Feature | PolyBot | Fully-Autonomous AI Bot | OctoBot Prediction | Poly-Maker |
-|---------|---------|-------------------------|-------------------|------------|
-| Strategies | 10 built-in | AI-only | Copy + Arb | Market Making |
-| Multi-venue | Yes (3 venues) | No | No | No |
-| Dashboard | Vue.js real-time | Terminal only | OctoBot UI | Google Sheets |
-| AI plugins | Any model | GPT-4/Claude/Gemini | Via OctoBot | None |
-| **MCP Server** | **Yes - Full integration** | No | No | No |
-| **Claude Code Skill** | **Yes - /polybot** | No | No | No |
-| **CLI Tools** | **50+ commands** | Limited | Via OctoBot | Basic |
-| **AI Trading Modes** | **3 (disabled/shadow/live)** | Live only | N/A | N/A |
-| **Approval Workflow** | **Yes - Human-in-loop** | No | No | No |
-| **Audit Logging** | **Full AI action logs** | Basic | Basic | None |
-| Shadow Mode | Yes | No | Yes | No |
-| License | MIT | MIT | GPL-3.0 | MIT |
+The honest baseline for most teams isn't another framework — it's writing a bespoke bot per venue. PolyBot compares against that and the closest existing tools:
 
-### Why PolyBot for AI-Assisted Trading?
+| Feature | PolyBot | Bespoke bots per venue | OctoBot Prediction | Poly-Maker |
+|---------|---------|------------------------|-------------------|------------|
+| Strategies | 10 built-in | Whatever you write | Copy + Arb | Market Making |
+| Multi-venue | Yes (Polymarket, Kalshi, Opinion, Binance) | One per bot | No | No |
+| Domain model | Shared, typed | Re-derived per bot | Via OctoBot | Ad hoc |
+| AI plugins | Any model, typed | DIY prompt glue | Via OctoBot | None |
+| **MCP Server** | **Yes — 25+ typed tools** | No | No | No |
+| **Claude Code Skill** | **Yes — /polybot** | No | No | No |
+| **AI Trading Modes** | **3 (disabled/shadow/live)** | DIY | N/A | N/A |
+| **Approval Workflow** | **Yes — human-in-the-loop** | DIY | No | No |
+| **Audit Logging** | **Full AI action logs** | DIY | Basic | None |
+| Paper-trading default | Yes | Rarely | Yes | No |
+| License | MIT | Yours | GPL-3.0 | MIT |
 
-PolyBot is the only prediction market trading system with **native AI agent support**:
+*When a bespoke bot wins:* single venue, no agent, minimal dependencies. *When PolyBot wins:* multiple venues, agent access, or a shared risk model you want enforced once rather than re-implemented per script.
 
-- **MCP Server**: AI agents (Claude, GPT, etc.) can query markets, analyze strategies, and execute trades via the Model Context Protocol
-- **Claude Code Skill**: Run `polybot` commands directly in Claude Code with `/polybot strategy list`
-- **Strategy Assessment**: AI can analyze your strategy performance and suggest code improvements
-- **Safety First**: Three trading modes (disabled/shadow/live), approval workflows, position limits, and full audit logging
-- **50+ CLI Commands**: Complete system control from the command line, all accessible to AI agents
+### Why PolyBot for agent-driven trading
+
+PolyBot is built to let AI agents operate prediction markets **safely**:
+
+- **MCP Server**: agents (Claude, GPT, etc.) query markets, analyse strategies, and propose trades via the Model Context Protocol — as typed tools, not prompts.
+- **Claude Code Skill**: run `polybot` commands directly in Claude Code with `/polybot strategy list`.
+- **Strategy Assessment**: an agent can analyse strategy performance and suggest code improvements.
+- **Safety First**: paper-trading default, three trading modes, human approval on live trades, position limits, and full audit logging.
 
 ## Contributing
 
@@ -359,7 +387,7 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## Disclaimer
 
-This software is for educational and research purposes. Trading on prediction markets involves financial risk. Use at your own discretion. Not financial advice.
+This software is for educational and research purposes. Trading on prediction markets involves financial risk. PolyBot makes no representation or warranty about returns. Use at your own discretion. Not financial advice.
 
 ---
 
